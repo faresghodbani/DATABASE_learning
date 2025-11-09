@@ -1,0 +1,171 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Hôte : localhost
+-- Généré le : lun. 03 nov. 2025 à 22:28
+-- Version du serveur : 10.6.22-MariaDB-0ubuntu0.22.04.1
+-- Version de PHP : 8.1.2-1ubuntu2.22
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Base de données : `L2I_GHODBANI`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `candidat`
+--
+
+DROP TABLE IF EXISTS `candidat`;
+CREATE TABLE `candidat` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `nom` varchar(50) NOT NULL,
+  `prénom` varchar(50) NOT NULL,
+  `ville` varchar(50) NOT NULL,
+  `parti` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `condidatures`
+--
+
+DROP TABLE IF EXISTS `condidatures`;
+CREATE TABLE `condidatures` (
+  `date` date NOT NULL,
+  `adjoint` int(10) UNSIGNED NOT NULL,
+  `condidat` int(10) UNSIGNED NOT NULL,
+  `conton` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `conton`
+--
+
+DROP TABLE IF EXISTS `conton`;
+CREATE TABLE `conton` (
+  `nom` varchar(50) NOT NULL,
+  `nb_electeurs` int(11) NOT NULL,
+  `departement` varchar(50) NOT NULL,
+  `montant` decimal(10,0) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `parti`
+--
+
+DROP TABLE IF EXISTS `parti`;
+CREATE TABLE `parti` (
+  `nom` varchar(50) NOT NULL,
+  `nb_adherants` int(10) UNSIGNED NOT NULL,
+  `catégorie` enum('gauche','droite','extreme_gauche','extreme_droite','centre') NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `resultats`
+--
+
+DROP TABLE IF EXISTS `resultats`;
+CREATE TABLE `resultats` (
+  `date` date NOT NULL,
+  `id_condidat` int(10) UNSIGNED NOT NULL,
+  `tour` tinyint(10) UNSIGNED NOT NULL,
+  `resultat` decimal(10,0) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Index pour les tables déchargées
+--
+
+--
+-- Index pour la table `candidat`
+--
+ALTER TABLE `candidat`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `parti` (`parti`);
+
+--
+-- Index pour la table `condidatures`
+--
+ALTER TABLE `condidatures`
+  ADD PRIMARY KEY (`date`,`condidat`),
+  ADD KEY `adjoint` (`adjoint`,`condidat`,`conton`),
+  ADD KEY `condidat` (`condidat`),
+  ADD KEY `conton` (`conton`);
+
+--
+-- Index pour la table `conton`
+--
+ALTER TABLE `conton`
+  ADD PRIMARY KEY (`nom`);
+
+--
+-- Index pour la table `parti`
+--
+ALTER TABLE `parti`
+  ADD PRIMARY KEY (`nom`);
+
+--
+-- Index pour la table `resultats`
+--
+ALTER TABLE `resultats`
+  ADD PRIMARY KEY (`date`,`id_condidat`,`tour`),
+  ADD KEY `condidat` (`id_condidat`),
+  ADD KEY `condidat_2` (`id_condidat`);
+
+--
+-- AUTO_INCREMENT pour les tables déchargées
+--
+
+--
+-- AUTO_INCREMENT pour la table `candidat`
+--
+ALTER TABLE `candidat`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- Contraintes pour les tables déchargées
+--
+
+--
+-- Contraintes pour la table `candidat`
+--
+ALTER TABLE `candidat`
+  ADD CONSTRAINT `parti` FOREIGN KEY (`parti`) REFERENCES `parti` (`nom`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Contraintes pour la table `condidatures`
+--
+ALTER TABLE `condidatures`
+  ADD CONSTRAINT `adjoint` FOREIGN KEY (`adjoint`) REFERENCES `candidat` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `condidat` FOREIGN KEY (`condidat`) REFERENCES `candidat` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `conton` FOREIGN KEY (`conton`) REFERENCES `conton` (`nom`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Contraintes pour la table `resultats`
+--
+ALTER TABLE `resultats`
+  ADD CONSTRAINT `id_condidat` FOREIGN KEY (`id_condidat`) REFERENCES `candidat` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
